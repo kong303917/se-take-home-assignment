@@ -61,7 +61,6 @@ export const useOrderSystem = () => {
               : order
           )
         );
-        console.log("removeBot", lastBot);
         if (lastBot.timer) clearTimeout(lastBot.timer);
       }
       return prev.slice(0, -1);
@@ -73,7 +72,6 @@ export const useOrderSystem = () => {
       setBots((prevBots) => {
         return prevBots.map((bot) => {
           if (!bot.isIdle) return bot;
-          console.log("order", orders);
           const pendingOrder = orders.find(
             (order) => order.status === "PENDING" && !order.botId
           );
@@ -114,10 +112,12 @@ export const useOrderSystem = () => {
         });
       });
     };
-
-    const interval = setInterval(processOrders, 1000);
+    let interval: NodeJS.Timeout;
+    if (orders.length > 0 && bots.length > 0) {
+      interval = setInterval(processOrders, 1000);
+    }
     return () => clearInterval(interval);
-  }, [orders]);
+  }, [orders, bots]);
 
   return {
     orders,
